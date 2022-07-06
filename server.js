@@ -37,11 +37,23 @@ const db = mysql.createConnection(
 // });
 
 // delete a candidate
-db.query(`DELETE FROM candidates WHERE id = ?`, 1, (err, result) => {
-    if(err) {
-        console.log(err);
-    }
-    console.log(result);
+// db.query(`DELETE FROM candidates WHERE id = ?`, 1, (err, result) => {
+//     if(err) {
+//         console.log(err);
+//     }
+//     console.log(result);
+// });
+
+// Create a candidate
+const sql = `INSERT INTO candidates (id, first_name, last_name, industry_connected) 
+              VALUES (?,?,?,?)`;
+const params = [1, 'Ronald', 'Firbank', 1];
+
+db.query(sql, params, (err, result) => {
+  if (err) {
+    console.log(err);
+  }
+  console.log(result);
 });
 
 // Default response for any other request (Not Found)
