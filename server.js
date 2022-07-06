@@ -1,6 +1,7 @@
 // require modules
 const express = require('express');
 const mysql = require('mysql2');
+const inputCheck = require('./utils/inputCheck');
 
 // designate PORT and initialize app
 const PORT = process.env.PORT || 3001;
@@ -83,16 +84,30 @@ app.delete('/api/candidate/:id', (req, res) => {
 });
 
 // Create a candidate
-// const sql = `INSERT INTO candidates (id, first_name, last_name, industry_connected) 
-//               VALUES (?,?,?,?)`;
-// const params = [1, 'Ronald', 'Firbank', 1];
+// use object destructuring to pull the body property out of the request object
+app.post('/api/candidate', ({body}, res) => {
+    // verify that user info in the request can create a candidate
+    const errors = inputCheck(body, 'first_name',  'last_name', 'industry_connected');
+    if (errors) {
+        res.status(400).json({error: errors});
+        return;
+    }
+    // if no errors in input, execute query to add candidate
+    const sql = `INSERT INTO candidates (first_name, last_name, industry_connected)
+              VALUES (?,?,?)`;
+    const params = [body.first_name, body.last_name, body.industry_connected];
 
-// db.query(sql, params, (err, result) => {
-//   if (err) {
-//     console.log(err);
-//   }
-//   console.log(result);
-// });
+    db.query(sql, params, (err, result) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: body
+        });
+    });
+});
 
 // Default response for any other request (Not Found)
 // catchall route, so must be placed below other routes or will override
