@@ -29,11 +29,19 @@ const db = mysql.createConnection(
 // });
 
 // get a single candidate
-db.query(`SELECT * FROM candidates WHERE id=1`, (err, row) => {
-    if (err) {
+// db.query(`SELECT * FROM candidates WHERE id=1`, (err, row) => {
+//     if (err) {
+//         console.log(err);
+//     }
+//     console.log(row);
+// });
+
+// delete a candidate
+db.query(`DELETE FROM candidates WHERE id = ?`, 1, (err, result) => {
+    if(err) {
         console.log(err);
     }
-    console.log(row);
+    console.log(result);
 });
 
 // Default response for any other request (Not Found)
