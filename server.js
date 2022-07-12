@@ -102,10 +102,10 @@ app.get('/api/candidates', (req, res) => {
 // get a single candidate
 app.get('/api/candidate/:id', (req, res) => {
     const sql = `SELECT candidates.*, parties.name 
-    AS party_name 
-    FROM candidates 
-    LEFT JOIN parties 
-    ON candidates.party_id = parties.id 
+    AS party_name
+    FROM candidates
+    LEFT JOIN parties
+    ON candidates.party_id = parties.id
     WHERE candidates.id = ?`;
     // assign the captured value populated in the req.params object with the key id to params
     const params = [req.params.id];
@@ -168,6 +168,35 @@ app.post('/api/candidate', ({body}, res) => {
             message: 'success',
             data: body
         });
+    });
+});
+
+// Update a candidate's party
+app.put('/api/candidate/:id', (req, res) => {
+    const errors = inputCheck(req.body, 'party_id');
+    if (errors) {
+        res.status(400).json({ error: errors });
+        return;
+    }
+
+    const sql = `UPDATE candidates SET party_id = ? 
+                 WHERE id = ?`;
+    const params = [req.body.party_id, req.params.id];
+    db.query(sql, params, (err, result) => {
+      if (err) {
+        res.status(400).json({ error: err.message });
+        // check if a record was found
+      } else if (!result.affectedRows) {
+        res.json({
+          message: 'Candidate not found'
+        });
+      } else {
+        res.json({
+          message: 'success',
+          data: req.body,
+          changes: result.affectedRows
+        });
+      }
     });
 });
 
